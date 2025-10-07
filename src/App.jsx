@@ -1,9 +1,12 @@
 import "./App.css";
+import SignupForm from "./components/Auth/SignupForm";
+import Header from "./components/Header";
 
 function App() {
   return (
     <>
-      <h2> Expense Tracker</h2>
+      <Header />
+      <SignupForm />
     </>
   );
 }
