@@ -14,7 +14,7 @@ const ProfileForm = () => {
   const [error, setError] = useState("");
 
   const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
-  const token = localStorage.getItem("token");
+  const token = authCtx.token;
 
   // ---- Step 1: Fetch user profile on mount ----
   useEffect(() => {

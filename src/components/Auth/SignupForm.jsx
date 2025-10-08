@@ -1,9 +1,11 @@
 import { useRef, useState } from "react";
 import { Button, Card, Container, FloatingLabel } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
+import { useHistory } from "react-router-dom";
 
 const SignupForm = () => {
   const emailRef = useRef();
+  const history = useHistory();
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
   const [error, setError] = useState("");
@@ -47,7 +49,7 @@ const SignupForm = () => {
 
       setSuccess("Signup successful!");
       setError("");
-      console.log("Signup successful");
+      history.push("/login");
     } catch (err) {
       setError(err.message);
       setSuccess("");

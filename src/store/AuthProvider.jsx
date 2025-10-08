@@ -4,8 +4,8 @@ import AuthContext from "./auth-context";
 const AuthProvider = (props) => {
   const initialToken = localStorage.getItem("token");
   const [token, setToken] = useState(initialToken || null);
-
   const [profileCompleted, setProfileCompleted] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
 
   const isLoggedIn = !!token;
 
@@ -29,6 +29,8 @@ const AuthProvider = (props) => {
     token,
     isLoggedIn,
     profileCompleted,
+    emailVerified,
+    setEmailVerified,
     login: loginHandler,
     logout: logoutHandler,
     markProfileCompleted: markProfileCompletedHandler,
