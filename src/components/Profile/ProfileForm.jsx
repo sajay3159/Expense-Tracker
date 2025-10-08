@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, Button, Container } from "react-bootstrap";
+import { Form, Button, Container, Alert } from "react-bootstrap";
 
 const ProfileForm = () => {
   const [formData, setFormData] = useState({
@@ -7,9 +7,11 @@ const ProfileForm = () => {
     photoUrl: "",
   });
 
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -21,6 +23,7 @@ const ProfileForm = () => {
 
     const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
     const token = localStorage.getItem("token");
+
     try {
       const response = await fetch(
         `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${apiKey}`,
@@ -41,14 +44,14 @@ const ProfileForm = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        alert("wrong email and password");
-        throw new Error(data.error.message || "Something went wrong");
+        setError(data.error?.message || "Failed to update profile");
+        setSuccess("");
+        return;
       }
 
-      setSuccess("update profile!");
+      setSuccess("Profile updated successfully!");
       setError("");
       setFormData({ fullName: "", photoUrl: "" });
-      console.log("update profile");
     } catch (err) {
       setError(err.message);
       setSuccess("");
@@ -56,26 +59,29 @@ const ProfileForm = () => {
   };
 
   return (
-    <Container>
+    <Container className="mt-4">
+      {success && <Alert variant="success">{success}</Alert>}
+      {error && <Alert variant="danger">{error}</Alert>}
+
       <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3" controlId="fullName">
+        <Form.Group controlId="fullName" className="mb-3">
           <Form.Label>Full Name</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Enter full name"
             name="fullName"
+            placeholder="Enter full name"
             value={formData.fullName}
             onChange={handleChange}
             required
           />
         </Form.Group>
 
-        <Form.Group className="mb-3" controlId="photoUrl">
+        <Form.Group controlId="photoUrl" className="mb-3">
           <Form.Label>Profile Photo URL</Form.Label>
           <Form.Control
             type="url"
-            placeholder="Enter photo URL"
             name="photoUrl"
+            placeholder="Enter photo URL"
             value={formData.photoUrl}
             onChange={handleChange}
           />
