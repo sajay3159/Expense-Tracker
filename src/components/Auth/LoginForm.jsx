@@ -49,7 +49,7 @@ const LoginForm = () => {
 
       setSuccess("Login successful!");
       setError("");
-      history.push("/");
+      history.push("/profile");
       localStorage.setItem("token", data.idToken);
     } catch (err) {
       setError(err.message);
