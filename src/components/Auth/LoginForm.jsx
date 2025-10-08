@@ -4,10 +4,11 @@ import {
   Card,
   Container,
   FloatingLabel,
+  Spinner,
   NavLink,
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import AuthContext from "../../store/auth-context";
 
 const LoginForm = () => {
@@ -17,12 +18,14 @@ const LoginForm = () => {
   const passwordRef = useRef();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const forgetPasswordHandler = () => {
     history.push("/ForgetForm");
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
@@ -61,9 +64,11 @@ const LoginForm = () => {
     } catch (err) {
       setError(err.message);
       setSuccess("");
+    } finally {
+      setLoading(false);
+      emailRef.current.value = "";
+      passwordRef.current.value = "";
     }
-    emailRef.current.value = "";
-    passwordRef.current.value = "";
   };
 
   return (
@@ -95,8 +100,22 @@ const LoginForm = () => {
                 type="submit"
                 variant="primary"
                 style={{ borderRadius: "20px" }}
+                disabled={loading}
               >
-                Login
+                {loading ? (
+                  <>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                    Logging...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
               <NavLink
                 className="text-center text-primary text-decoration-underline"
@@ -108,13 +127,22 @@ const LoginForm = () => {
           </Form>
         </Card.Body>
       </Card>
-
       <Card
         style={{ width: "20rem", backgroundColor: "#c3dbcf" }}
         className="py-2"
       >
         <Card.Body className="text-center">
-          Don't have an account? Sign up
+          Don't have an account?{" "}
+          <Link
+            to="/signup"
+            style={{
+              textDecoration: "underline",
+              cursor: "pointer",
+              color: "blue",
+            }}
+          >
+            Sign up
+          </Link>
         </Card.Body>
       </Card>
     </Container>

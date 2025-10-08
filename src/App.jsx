@@ -17,13 +17,13 @@ function App() {
     <>
       <Header />
       <Switch>
-        <Route path="/" exact component={SignupForm} />
-        {authCtx.isLoggedIn && (
-          <>
-            <Route path="/profile" component={ProfilePage} />
-            <Route path="/profile-form" component={ProfileForm} />
-          </>
-        )}
+        <Route path="/signup" component={SignupForm} />
+        <Route path="/profile">
+          {authCtx.isLoggedIn ? <ProfilePage /> : <Redirect to="/login" />}
+        </Route>
+        <Route path="/profile-form">
+          {authCtx.isLoggedIn ? <ProfileForm /> : <Redirect to="/login" />}
+        </Route>{" "}
         {!authCtx.isLoggedIn && (
           <Route path="/profile" render={() => <Redirect to="/login" />} />
         )}

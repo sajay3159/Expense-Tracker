@@ -1,7 +1,13 @@
 import { useRef, useState } from "react";
-import { Button, Card, Container, FloatingLabel } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Container,
+  FloatingLabel,
+  Spinner,
+} from "react-bootstrap";
 import Form from "react-bootstrap/Form";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const SignupForm = () => {
   const emailRef = useRef();
@@ -10,9 +16,11 @@ const SignupForm = () => {
   const confirmPasswordRef = useRef();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
@@ -53,10 +61,12 @@ const SignupForm = () => {
     } catch (err) {
       setError(err.message);
       setSuccess("");
+    } finally {
+      setLoading(false);
+      emailRef.current.value = "";
+      passwordRef.current.value = "";
+      confirmPasswordRef.current.value = "";
     }
-    emailRef.current.value = "";
-    passwordRef.current.value = "";
-    confirmPasswordRef.current.value = "";
   };
 
   return (
@@ -97,19 +107,44 @@ const SignupForm = () => {
                 type="submit"
                 variant="primary"
                 style={{ borderRadius: "20px" }}
+                disabled={loading}
               >
-                Sign Up
+                {loading ? (
+                  <>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                    Signing up...
+                  </>
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
             </div>
           </Form>
         </Card.Body>
       </Card>
-
       <Card
         style={{ width: "20rem", backgroundColor: "#c3dbcf" }}
         className="py-2"
       >
-        <Card.Body className="text-center">Have an account? Login</Card.Body>
+        <Card.Body className="text-center">
+          Have an account?{" "}
+          <Link
+            to="/login"
+            style={{
+              textDecoration: "underline",
+              cursor: "pointer",
+              color: "blue",
+            }}
+          >
+            Login
+          </Link>
+        </Card.Body>
       </Card>
     </Container>
   );
