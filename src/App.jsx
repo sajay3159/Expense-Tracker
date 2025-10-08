@@ -8,6 +8,7 @@ import ProfileForm from "./components/Profile/ProfileForm";
 import { useContext } from "react";
 import AuthContext from "./store/auth-context";
 import NotFound from "./components/NotFound";
+import ForgetForm from "./components/Auth/ForgetForm";
 
 function App() {
   const authCtx = useContext(AuthContext);
@@ -27,6 +28,7 @@ function App() {
           <Route path="/profile" render={() => <Redirect to="/login" />} />
         )}
         <Route path="/login" component={LoginForm} />
+        <Route path="/ForgetForm" component={ForgetForm} />
         <Route path="*" component={NotFound} />
       </Switch>
     </>

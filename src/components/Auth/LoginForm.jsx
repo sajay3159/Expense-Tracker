@@ -18,6 +18,9 @@ const LoginForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const forgetPasswordHandler = () => {
+    history.push("/ForgetForm");
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -95,7 +98,10 @@ const LoginForm = () => {
               >
                 Login
               </Button>
-              <NavLink className="text-center text-primary text-decoration-underline">
+              <NavLink
+                className="text-center text-primary text-decoration-underline"
+                onClick={forgetPasswordHandler}
+              >
                 Forget Password
               </NavLink>
             </div>
