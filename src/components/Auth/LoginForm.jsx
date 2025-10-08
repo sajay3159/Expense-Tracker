@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import {
   Button,
   Card,
@@ -8,8 +8,10 @@ import {
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { useHistory } from "react-router-dom";
+import AuthContext from "../../store/auth-context";
 
 const LoginForm = () => {
+  const authCtx = useContext(AuthContext);
   const history = useHistory();
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -49,8 +51,10 @@ const LoginForm = () => {
 
       setSuccess("Login successful!");
       setError("");
-      history.push("/profile");
+      authCtx.login(data.idToken, data.email);
       localStorage.setItem("token", data.idToken);
+
+      history.push("/profile");
     } catch (err) {
       setError(err.message);
       setSuccess("");

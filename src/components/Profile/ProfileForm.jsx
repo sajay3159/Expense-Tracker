@@ -1,15 +1,52 @@
-import { useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Form, Button, Container, Alert } from "react-bootstrap";
+import { useHistory } from "react-router-dom";
+import AuthContext from "../../store/auth-context";
 
 const ProfileForm = () => {
+  const history = useHistory();
+  const authCtx = useContext(AuthContext);
   const [formData, setFormData] = useState({
     fullName: "",
     photoUrl: "",
   });
-
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
+  const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
+  const token = localStorage.getItem("token");
+
+  // ---- Step 1: Fetch user profile on mount ----
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(
+          `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
+          {
+            method: "POST",
+            body: JSON.stringify({ idToken: token }),
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error?.message || "Failed to fetch profile");
+        }
+        console.log("data", data);
+        const user = data.users[0];
+        setFormData({
+          fullName: user.displayName || "",
+          photoUrl: user.photoUrl || "",
+        });
+      } catch (err) {
+        console.error("Error fetching profile:", err.message);
+      }
+    };
+
+    fetchProfile();
+  }, [token]);
+
+  // ---- Step 2: Handle input change ----
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -18,14 +55,11 @@ const ProfileForm = () => {
     }));
   };
 
+  // ---- Step 3: Submit updated profile ----
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
-    const token = localStorage.getItem("token");
-
     try {
-      const response = await fetch(
+      const res = await fetch(
         `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${apiKey}`,
         {
           method: "POST",
@@ -35,23 +69,20 @@ const ProfileForm = () => {
             photoUrl: formData.photoUrl,
             returnSecureToken: true,
           }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error?.message || "Failed to update profile");
-        setSuccess("");
-        return;
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error?.message || "Failed to update profile");
       }
+
+      authCtx.markProfileCompleted();
 
       setSuccess("Profile updated successfully!");
       setError("");
-      setFormData({ fullName: "", photoUrl: "" });
+      history.push("/profile");
     } catch (err) {
       setError(err.message);
       setSuccess("");
