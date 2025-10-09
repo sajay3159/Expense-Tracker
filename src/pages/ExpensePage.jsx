@@ -126,7 +126,7 @@ const ExpensePage = () => {
         onClose={() => setToast({ ...toast, show: false })}
         delay={4000}
         autohide
-        bg="success"
+        bg={toast.variant}
         style={{ position: "fixed", top: 20, right: 20, zIndex: 9999 }}
       >
         <Toast.Body className="text-white">{toast.message}</Toast.Body>
