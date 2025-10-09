@@ -21,7 +21,7 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
 
   const forgetPasswordHandler = () => {
-    history.push("/ForgetForm");
+    history.push("/forgetForm");
   };
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -9,6 +9,7 @@ import { useContext } from "react";
 import AuthContext from "./store/auth-context";
 import NotFound from "./components/NotFound";
 import ForgetForm from "./components/Auth/ForgetForm";
+import ExpensePage from "./pages/ExpensePage";
 
 function App() {
   const authCtx = useContext(AuthContext);
@@ -28,7 +29,10 @@ function App() {
           <Route path="/profile" render={() => <Redirect to="/login" />} />
         )}
         <Route path="/login" component={LoginForm} />
-        <Route path="/ForgetForm" component={ForgetForm} />
+        <Route path="/forgetForm" component={ForgetForm} />
+        {authCtx.isLoggedIn && (
+          <Route path="/expense" component={ExpensePage} />
+        )}
         <Route path="*" component={NotFound} />
       </Switch>
     </>
