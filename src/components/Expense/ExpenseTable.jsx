@@ -1,6 +1,18 @@
-import { Table } from "react-bootstrap";
+import { Spinner, Table } from "react-bootstrap";
 
-const ExpenseTable = ({ expenses }) => {
+const ExpenseTable = ({ expenses, loading }) => {
+  if (loading) {
+    return (
+      <div className="text-center py-4">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
+
+  if (expenses.length === 0) {
+    return <p className="text-center">No expenses added yet.</p>;
+  }
+
   return (
     <Table striped bordered hover responsive>
       <thead>
@@ -12,22 +24,14 @@ const ExpenseTable = ({ expenses }) => {
         </tr>
       </thead>
       <tbody>
-        {expenses.length === 0 ? (
-          <tr>
-            <td colSpan="4" className="text-center">
-              No expenses added yet.
-            </td>
+        {expenses.map((exp, idx) => (
+          <tr key={exp.id}>
+            <td>{idx + 1}</td>
+            <td>{exp.expense}</td>
+            <td>{exp.description}</td>
+            <td>{exp.category}</td>
           </tr>
-        ) : (
-          expenses.map((exp, idx) => (
-            <tr key={idx}>
-              <td>{idx + 1}</td>
-              <td>{exp.expense}</td>
-              <td>{exp.description}</td>
-              <td>{exp.category}</td>
-            </tr>
-          ))
-        )}
+        ))}
       </tbody>
     </Table>
   );

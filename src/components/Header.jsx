@@ -24,7 +24,6 @@ function Header() {
             <Nav.Link
               as={NavLink}
               to="/home"
-              end
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Home

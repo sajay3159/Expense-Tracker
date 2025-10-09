@@ -8,7 +8,7 @@ const ExpenseForm = ({ onAddExpense }) => {
   const descriptionRef = useRef();
   const categoryRef = useRef();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -17,15 +17,14 @@ const ExpenseForm = ({ onAddExpense }) => {
       description: descriptionRef.current.value,
       category: categoryRef.current.value,
     };
+    await onAddExpense(expenseData);
 
-    onAddExpense(expenseData);
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
+    setLoading(false);
     expenseRef.current.value = "";
     descriptionRef.current.value = "";
     categoryRef.current.value = "";
   };
+
   return (
     <Container className="my-5" style={{ maxWidth: "400px" }}>
       <Card style={{ width: "22rem" }} className="py-3">
@@ -38,6 +37,7 @@ const ExpenseForm = ({ onAddExpense }) => {
                 type="number"
                 placeholder="Expense"
                 ref={expenseRef}
+                min={0}
                 required
               />
             </Form.Group>
@@ -64,6 +64,7 @@ const ExpenseForm = ({ onAddExpense }) => {
                 <option value="transport">Transport</option>
                 <option value="shopping">Shopping</option>
                 <option value="utilities">Utilities</option>
+                <option value="petrol">Petrol</option>
                 <option value="other">Other</option>
               </Form.Select>
             </Form.Group>
