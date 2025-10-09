@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
 
-const ExpenseForm = ({ onAddExpense }) => {
+const ExpenseForm = ({ onAddExpense, editingExpense }) => {
   const [loading, setLoading] = useState(false);
 
   const expenseRef = useRef();
@@ -24,6 +24,14 @@ const ExpenseForm = ({ onAddExpense }) => {
     descriptionRef.current.value = "";
     categoryRef.current.value = "";
   };
+
+  useEffect(() => {
+    if (editingExpense) {
+      expenseRef.current.value = editingExpense.expense;
+      descriptionRef.current.value = editingExpense.description;
+      categoryRef.current.value = editingExpense.category;
+    }
+  }, [editingExpense]);
 
   return (
     <Container className="my-5" style={{ maxWidth: "400px" }}>
@@ -60,12 +68,12 @@ const ExpenseForm = ({ onAddExpense }) => {
                 required
               >
                 <option value="">Select Category</option>
-                <option value="food">Food</option>
-                <option value="transport">Transport</option>
-                <option value="shopping">Shopping</option>
-                <option value="utilities">Utilities</option>
-                <option value="petrol">Petrol</option>
-                <option value="other">Other</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Petrol">Petrol</option>
+                <option value="Other">Other</option>
               </Form.Select>
             </Form.Group>
             <div className="d-grid gap-2">
