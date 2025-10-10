@@ -5,6 +5,7 @@ import { NavLink, useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../store/authSlice";
+import { themeActions } from "../store/themeSlice";
 
 function Header() {
   const dispatch = useDispatch();
@@ -13,6 +14,7 @@ function Header() {
   const isDarkMode = useSelector((state) => state.theme.darkMode);
   const logoutHandler = () => {
     dispatch(authActions.logout());
+    dispatch(themeActions.toggleTheme());
     history.replace("/login");
   };
   return (
