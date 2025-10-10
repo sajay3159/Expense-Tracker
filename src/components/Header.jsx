@@ -1,16 +1,18 @@
-import { useContext } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import AuthContext from "../store/auth-context";
 import { NavLink, useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../store/authSlice";
 
 function Header() {
+  const dispatch = useDispatch();
   const history = useHistory();
-  const authCtx = useContext(AuthContext);
+
+  const isLoggedIn = useSelector((state) => !!state.auth.token);
   const logoutHandler = () => {
-    authCtx.logout();
+    dispatch(authActions.logout());
     history.replace("/login");
   };
   return (
@@ -42,7 +44,7 @@ function Header() {
             >
               About Us
             </Nav.Link>
-            {authCtx.isLoggedIn && (
+            {isLoggedIn && (
               <Nav.Link
                 as={NavLink}
                 to="/expense"
@@ -52,7 +54,7 @@ function Header() {
               </Nav.Link>
             )}
           </Nav>
-          {authCtx.isLoggedIn && (
+          {isLoggedIn && (
             <Nav>
               <Button
                 variant="outline-danger"

@@ -3,12 +3,13 @@ import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
-import AuthProvider from "./store/AuthProvider.jsx";
+import { Provider } from "react-redux";
+import store from "./store/store.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <AuthProvider>
+    <Provider store={store}>
       <App />
-    </AuthProvider>
+    </Provider>
   </BrowserRouter>
 );

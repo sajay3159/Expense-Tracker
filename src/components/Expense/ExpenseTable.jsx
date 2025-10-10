@@ -11,6 +11,10 @@ const ExpenseTable = ({
     0
   );
 
+  const activatePremiumHandler = () => {
+    alert("Premium activated");
+  };
+
   if (loading) {
     return (
       <div className="text-center py-4">
@@ -38,7 +42,20 @@ const ExpenseTable = ({
         {expenses.map((exp, idx) => (
           <tr key={exp.id}>
             <td>{idx + 1}</td>
-            <td>{exp.expense}</td>
+            <td>
+              {exp.expense}{" "}
+              {exp.expense > 10000 && (
+                <Button
+                  variant="warning"
+                  className="ms-3"
+                  size="sm"
+                  style={{ borderRadius: "20px" }}
+                  onClick={activatePremiumHandler}
+                >
+                  Activate Premium
+                </Button>
+              )}
+            </td>
             <td>{exp.description}</td>
             <td>{exp.category}</td>
             <td>
