@@ -11,6 +11,9 @@ const themeSlice = createSlice({
     toggleTheme(state) {
       state.darkMode = !state.darkMode;
     },
+    setLightMode(state) {
+      state.darkMode = false;
+    },
   },
 });
 

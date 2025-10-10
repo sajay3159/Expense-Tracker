@@ -25,6 +25,7 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("email");
     },
+
     markProfileCompleted(state) {
       state.profileCompleted = true;
     },

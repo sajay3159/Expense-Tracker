@@ -14,7 +14,7 @@ function Header() {
   const isDarkMode = useSelector((state) => state.theme.darkMode);
   const logoutHandler = () => {
     dispatch(authActions.logout());
-    dispatch(themeActions.toggleTheme());
+    dispatch(themeActions.setLightMode());
     history.replace("/login");
   };
   return (
