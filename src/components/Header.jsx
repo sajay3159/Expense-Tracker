@@ -9,15 +9,18 @@ import { authActions } from "../store/authSlice";
 function Header() {
   const dispatch = useDispatch();
   const history = useHistory();
-
   const isLoggedIn = useSelector((state) => !!state.auth.token);
+  const isDarkMode = useSelector((state) => state.theme.darkMode);
   const logoutHandler = () => {
     dispatch(authActions.logout());
     history.replace("/login");
   };
   return (
     <>
-      <Navbar bg="light" data-bs-theme="light">
+      <Navbar
+        bg={isDarkMode ? "dark" : "light"}
+        variant={isDarkMode ? "dark" : "light"}
+      >
         <Container>
           <Navbar.Brand href="#home" className="fs-3">
             MyWebLinks

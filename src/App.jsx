@@ -9,10 +9,16 @@ import NotFound from "./components/NotFound";
 import ForgetForm from "./components/Auth/ForgetForm";
 import ExpensePage from "./pages/ExpensePage";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 function App() {
+  const darkMode = useSelector((state) => state.theme.darkMode);
   const token = useSelector((state) => state.auth.token);
   const isLoggedIn = !!token;
+
+  useEffect(() => {
+    document.body.className = darkMode ? "dark" : "light";
+  }, [darkMode]);
 
   return (
     <>

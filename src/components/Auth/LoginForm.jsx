@@ -9,10 +9,12 @@ import {
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { Link, useHistory } from "react-router-dom";
-import AuthContext from "../../store/auth-context";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../store/authSlice";
 
 const LoginForm = () => {
-  const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
+  // const authCtx = useContext(AuthContext);
   const history = useHistory();
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -57,7 +59,8 @@ const LoginForm = () => {
 
       setSuccess("Login successful!");
       setError("");
-      authCtx.login(data.idToken, data.email);
+      dispatch(authActions.login({ token: data.idToken, email: data.email }));
+      // authCtx.login(data.idToken, data.email);
       localStorage.setItem("token", data.idToken);
 
       history.push("/profile");
