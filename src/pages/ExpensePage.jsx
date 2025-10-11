@@ -43,7 +43,7 @@ const ExpensePage = () => {
   };
 
   // Add expense in a list
-  const onAddExpense = async (newExpense) => {
+  const addExpenseHandler = async (newExpense) => {
     setLoading(true);
     try {
       let url =
@@ -130,7 +130,7 @@ const ExpensePage = () => {
   return (
     <Container className="my-4">
       <ExpenseForm
-        onAddExpense={onAddExpense}
+        onAddExpense={addExpenseHandler}
         editingExpense={editingExpense}
       />
       <ExpenseTable
