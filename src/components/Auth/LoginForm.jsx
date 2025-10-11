@@ -59,7 +59,13 @@ const LoginForm = () => {
 
       setSuccess("Login successful!");
       setError("");
-      dispatch(authActions.login({ token: data.idToken, email: data.email }));
+      dispatch(
+        authActions.login({
+          token: data.idToken,
+          email: data.email,
+          uid: data.localId,
+        })
+      );
       // authCtx.login(data.idToken, data.email);
       localStorage.setItem("token", data.idToken);
 

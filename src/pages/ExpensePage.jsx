@@ -8,6 +8,8 @@ import { expensesActions } from "../store/expensesSlice";
 const ExpensePage = () => {
   const dispatch = useDispatch();
   const expenses = useSelector((state) => state.expenses.items);
+  const userId = useSelector((state) => state.auth.uid);
+  const idToken = useSelector((state) => state.auth.token);
 
   const [toast, setToast] = useState({
     show: false,
@@ -19,16 +21,19 @@ const ExpensePage = () => {
 
   // Fetch expense list
   const expenseHandler = async () => {
+    if (!userId || !idToken) return;
     setLoading(true);
     try {
       const response = await fetch(
-        "https://expense-tracker-414ee-default-rtdb.firebaseio.com/expenses.json"
+        `https://expense-tracker-414ee-default-rtdb.firebaseio.com/users/${userId}/expenses.json?auth=${idToken}`
       );
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error?.message || "Something went wrong");
       }
       const data = await response.json();
+
+      // data into array format
       const loadedExpenses = Object.entries(data || {}).map(
         ([id, expense]) => ({
           id,
@@ -42,16 +47,17 @@ const ExpensePage = () => {
     setLoading(false);
   };
 
-  // Add expense in a list
+  // Add or update expense for authenticated user
   const addExpenseHandler = async (newExpense) => {
+    if (!userId || !idToken) return;
+
     setLoading(true);
     try {
-      let url =
-        "https://expense-tracker-414ee-default-rtdb.firebaseio.com/expenses.json";
+      let url = `https://expense-tracker-414ee-default-rtdb.firebaseio.com/users/${userId}/expenses.json?auth=${idToken}`;
       let method = "POST";
 
       if (editingExpense?.id) {
-        url = `https://expense-tracker-414ee-default-rtdb.firebaseio.com/expenses/${editingExpense.id}.json`;
+        url = `https://expense-tracker-414ee-default-rtdb.firebaseio.com/users/${userId}/expenses/${editingExpense.id}.json?auth=${idToken}`;
         method = "PUT";
       }
 
@@ -92,20 +98,22 @@ const ExpensePage = () => {
     setLoading(false);
   };
 
-  // Edit an expense
-  const editExpenseHandler = async (id) => {
+  // Edit an expense locally
+  const editExpenseHandler = (id) => {
     const editing = expenses.find((item) => item.id === id);
     if (editing) {
       setEditingExpense(editing);
     }
   };
 
-  // Delete an expense from list
+  // Delete an expense
   const deleteExpenseHandler = async (id) => {
+    if (!userId || !idToken) return;
+
     setLoading(true);
     try {
       const response = await fetch(
-        `https://expense-tracker-414ee-default-rtdb.firebaseio.com/expenses/${id}.json`,
+        `https://expense-tracker-414ee-default-rtdb.firebaseio.com/users/${userId}/expenses/${id}.json?auth=${idToken}`,
         { method: "DELETE" }
       );
       if (!response.ok) throw new Error("Failed to delete expense");
@@ -125,7 +133,7 @@ const ExpensePage = () => {
 
   useEffect(() => {
     expenseHandler();
-  }, []);
+  }, [userId, idToken]);
 
   return (
     <Container className="my-4">
