@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import ExpenseForm from "./ExpenseForm";
 import { Provider } from "react-redux";
 import store from "../../store/store.jsx";
@@ -91,4 +91,19 @@ test("renders Utilities option", () => {
     </Provider>
   );
   expect(screen.getByText("Utilities")).toBeInTheDocument();
+});
+
+test("Add Expense button exists and can be clicked", () => {
+  render(
+    <Provider store={store}>
+      <ExpenseForm />
+    </Provider>
+  );
+
+  const addBtn = screen.getByText("Add Expense");
+  expect(addBtn).toBeInTheDocument();
+  fireEvent.click(addBtn);
+
+  // Just check button exists and was clickable
+  expect(addBtn).toBeEnabled();
 });
