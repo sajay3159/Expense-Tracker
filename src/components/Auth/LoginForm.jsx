@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Button,
   Card,
@@ -14,7 +14,6 @@ import { authActions } from "../../store/authSlice";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  // const authCtx = useContext(AuthContext);
   const history = useHistory();
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -66,7 +65,7 @@ const LoginForm = () => {
           uid: data.localId,
         })
       );
-      // authCtx.login(data.idToken, data.email);
+      authCtx.login(data.idToken, data.email);
       localStorage.setItem("token", data.idToken);
 
       history.push("/profile");

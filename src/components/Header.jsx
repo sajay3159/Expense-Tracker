@@ -30,21 +30,21 @@ function Header() {
           <Nav className="me-auto">
             <Nav.Link
               as={NavLink}
-              to="/home"
+              to="#home"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Home
             </Nav.Link>
             <Nav.Link
               as={NavLink}
-              to="/products"
+              to="#products"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Products
             </Nav.Link>
             <Nav.Link
               as={NavLink}
-              to="/about"
+              to="#about"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               About Us

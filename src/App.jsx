@@ -24,18 +24,32 @@ function App() {
     <>
       <Header />
       <Switch>
-        <Route path="/signup" component={SignupForm} />
-        <Route path="/login" component={LoginForm} />
+        <Route path="/" exact>
+          <Redirect to="/login" />
+        </Route>
+
+        <Route path="/login">
+          {isLoggedIn ? <Redirect to="/expense" /> : <LoginForm />}
+        </Route>
+
+        <Route path="/signup">
+          {isLoggedIn ? <Redirect to="/expense" /> : <SignupForm />}
+        </Route>
+
         <Route path="/forgetForm" component={ForgetForm} />
+
         <Route path="/profile">
           {isLoggedIn ? <ProfilePage /> : <Redirect to="/login" />}
         </Route>
+
         <Route path="/profile-form">
           {isLoggedIn ? <ProfileForm /> : <Redirect to="/login" />}
         </Route>
+
         <Route path="/expense">
           {isLoggedIn ? <ExpensePage /> : <Redirect to="/login" />}
         </Route>
+
         <Route path="*" component={NotFound} />
       </Switch>
     </>
