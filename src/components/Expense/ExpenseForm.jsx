@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
 const ExpenseForm = ({ onAddExpense, editingExpense }) => {
+  const isDarkMode = useSelector((state) => state.theme.darkMode);
   const [loading, setLoading] = useState(false);
 
   const expenseRef = useRef();
@@ -34,8 +36,13 @@ const ExpenseForm = ({ onAddExpense, editingExpense }) => {
   }, [editingExpense]);
 
   return (
-    <Container className="my-5" style={{ maxWidth: "400px" }}>
-      <Card style={{ width: "22rem" }} className="py-3">
+    <Container className="my-5" style={{ maxWidth: "400px", my: "1rem" }}>
+      <Card
+        style={{ width: "22rem" }}
+        className={`py-3 ${
+          isDarkMode ? "bg-dark text-light" : "bg-light text-dark"
+        }`}
+      >
         <Card.Body>
           <Card.Title className="text-center mb-3">Expense Entry</Card.Title>
           <Form onSubmit={handleSubmit}>

@@ -1,50 +1,47 @@
-import { useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Form, Button, Container, Alert } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
-import AuthContext from "../../store/auth-context";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../../store/authSlice";
 
 const ProfileForm = () => {
   const history = useHistory();
-  const authCtx = useContext(AuthContext);
+  const token = useSelector((state) => state.auth.token);
+  const dispatch = useDispatch();
+  // const authCtx = useContext(AuthContext);
   const [formData, setFormData] = useState({
     fullName: "",
     photoUrl: "",
   });
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-
   const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
-  const token = authCtx.token;
 
   // ---- Step 1: Fetch user profile on mount ----
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
-          {
-            method: "POST",
-            body: JSON.stringify({ idToken: token }),
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error?.message || "Failed to fetch profile");
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
+        {
+          method: "POST",
+          body: JSON.stringify({ idToken: token }),
+          headers: { "Content-Type": "application/json" },
         }
-        console.log("data", data);
-        const user = data.users[0];
-        setFormData({
-          fullName: user.displayName || "",
-          photoUrl: user.photoUrl || "",
-        });
-      } catch (err) {
-        console.error("Error fetching profile:", err.message);
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error?.message || "Failed to fetch profile");
       }
-    };
-
-    fetchProfile();
-  }, [token]);
+      console.log("data", data);
+      const user = data.users[0];
+      setFormData({
+        fullName: user.displayName || "",
+        photoUrl: user.photoUrl || "",
+      });
+    } catch (err) {
+      console.error("Error fetching profile:", err.message);
+    }
+  };
 
   // ---- Step 2: Handle input change ----
   const handleChange = (e) => {
@@ -78,7 +75,8 @@ const ProfileForm = () => {
         throw new Error(data.error?.message || "Failed to update profile");
       }
 
-      authCtx.markProfileCompleted();
+      dispatch(authActions.markProfileCompleted());
+      // authCtx.markProfileCompleted();
 
       setSuccess("Profile updated successfully!");
       setError("");
@@ -88,6 +86,10 @@ const ProfileForm = () => {
       setSuccess("");
     }
   };
+
+  useEffect(() => {
+    fetchProfile();
+  }, [token]);
 
   return (
     <Container className="mt-4">

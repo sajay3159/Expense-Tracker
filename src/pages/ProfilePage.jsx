@@ -1,20 +1,23 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
-import AuthContext from "../store/auth-context";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../store/authSlice";
 
 const ProfilePage = () => {
   const history = useHistory();
-  const authCtx = useContext(AuthContext);
-  const token = authCtx.token;
+  const dispatch = useDispatch();
+
+  const token = useSelector((state) => state.auth.token);
+  const emailVerified = useSelector((state) => state.auth.emailVerified);
+  const profileCompleted = useSelector((state) => state.auth.profileCompleted);
+
   const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
 
-  // Navigate to complete profile form
   const handleCompleteProfile = () => {
     history.push("/profile-form");
   };
 
-  // Send verification email
   const handleVerifyEmail = async () => {
     if (!token) {
       alert("User not authenticated");
@@ -36,13 +39,13 @@ const ProfilePage = () => {
         alert(data.error?.message || "Verification email failed");
         return;
       }
+
       alert("Verification email sent. Please check your inbox.");
     } catch (error) {
       alert("Error sending verification email: " + error.message);
     }
   };
 
-  //   after verification refresh the page
   const refreshUserProfile = async () => {
     if (!token) return;
 
@@ -59,7 +62,7 @@ const ProfilePage = () => {
       const data = await response.json();
       if (response.ok && data.users && data.users.length > 0) {
         const emailVerified = data.users[0].emailVerified;
-        authCtx.setEmailVerified(emailVerified);
+        dispatch(authActions.setEmailVerified(emailVerified));
       } else {
         console.error("Failed to fetch user info", data);
       }
@@ -78,30 +81,24 @@ const ProfilePage = () => {
       <div className="d-flex justify-content-between align-items-center">
         <span></span>
         <div className="text-end">
-          {!authCtx.emailVerified ? (
-            <>
-              <Button
-                variant="outline-primary"
-                size="sm"
-                onClick={handleVerifyEmail}
-                className="me-2"
-              >
-                Verify Email ID
-              </Button>
-            </>
+          {!emailVerified ? (
+            <Button
+              variant="outline-primary"
+              size="sm"
+              onClick={handleVerifyEmail}
+              className="me-2"
+            >
+              Verify Email ID
+            </Button>
+          ) : profileCompleted ? (
+            <p className="text-success mb-0">Your Profile is completed.</p>
           ) : (
-            <>
-              {authCtx.profileCompleted ? (
-                <p className="text-success mb-0">Your Profile is completed.</p>
-              ) : (
-                <p className="mb-1">
-                  Your profile is incomplete.
-                  <Button variant="link" onClick={handleCompleteProfile}>
-                    Complete Now
-                  </Button>
-                </p>
-              )}
-            </>
+            <p className="mb-1">
+              Your profile is incomplete.{" "}
+              <Button variant="link" onClick={handleCompleteProfile}>
+                Complete Now
+              </Button>
+            </p>
           )}
         </div>
       </div>

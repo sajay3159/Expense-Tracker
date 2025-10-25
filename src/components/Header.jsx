@@ -1,21 +1,28 @@
-import { useContext } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import AuthContext from "../store/auth-context";
 import { NavLink, useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../store/authSlice";
+import { themeActions } from "../store/themeSlice";
 
 function Header() {
+  const dispatch = useDispatch();
   const history = useHistory();
-  const authCtx = useContext(AuthContext);
+  const isLoggedIn = useSelector((state) => !!state.auth.token);
+  const isDarkMode = useSelector((state) => state.theme.darkMode);
   const logoutHandler = () => {
-    authCtx.logout();
+    dispatch(authActions.logout());
+    dispatch(themeActions.setLightMode());
     history.replace("/login");
   };
   return (
     <>
-      <Navbar bg="light" data-bs-theme="light">
+      <Navbar
+        bg={isDarkMode ? "dark" : "light"}
+        variant={isDarkMode ? "dark" : "light"}
+      >
         <Container>
           <Navbar.Brand href="#home" className="fs-3">
             MyWebLinks
@@ -23,26 +30,26 @@ function Header() {
           <Nav className="me-auto">
             <Nav.Link
               as={NavLink}
-              to="/home"
+              to="#home"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Home
             </Nav.Link>
             <Nav.Link
               as={NavLink}
-              to="/products"
+              to="#products"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               Products
             </Nav.Link>
             <Nav.Link
               as={NavLink}
-              to="/about"
+              to="#about"
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               About Us
             </Nav.Link>
-            {authCtx.isLoggedIn && (
+            {isLoggedIn && (
               <Nav.Link
                 as={NavLink}
                 to="/expense"
@@ -52,7 +59,7 @@ function Header() {
               </Nav.Link>
             )}
           </Nav>
-          {authCtx.isLoggedIn && (
+          {isLoggedIn && (
             <Nav>
               <Button
                 variant="outline-danger"

@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Button,
   Card,
@@ -9,10 +9,11 @@ import {
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { Link, useHistory } from "react-router-dom";
-import AuthContext from "../../store/auth-context";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../store/authSlice";
 
 const LoginForm = () => {
-  const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
   const history = useHistory();
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -57,6 +58,13 @@ const LoginForm = () => {
 
       setSuccess("Login successful!");
       setError("");
+      dispatch(
+        authActions.login({
+          token: data.idToken,
+          email: data.email,
+          uid: data.localId,
+        })
+      );
       authCtx.login(data.idToken, data.email);
       localStorage.setItem("token", data.idToken);
 

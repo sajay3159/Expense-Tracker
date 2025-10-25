@@ -5,34 +5,51 @@ import SignupForm from "./components/Auth/SignupForm";
 import Header from "./components/Header";
 import ProfilePage from "./pages/ProfilePage";
 import ProfileForm from "./components/Profile/ProfileForm";
-import { useContext } from "react";
-import AuthContext from "./store/auth-context";
 import NotFound from "./components/NotFound";
 import ForgetForm from "./components/Auth/ForgetForm";
 import ExpensePage from "./pages/ExpensePage";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 function App() {
-  const authCtx = useContext(AuthContext);
+  const darkMode = useSelector((state) => state.theme.darkMode);
+  const token = useSelector((state) => state.auth.token);
+  const isLoggedIn = !!token;
+
+  useEffect(() => {
+    document.body.className = darkMode ? "dark" : "light";
+  }, [darkMode]);
 
   return (
     <>
       <Header />
       <Switch>
-        <Route path="/signup" component={SignupForm} />
-        <Route path="/profile">
-          {authCtx.isLoggedIn ? <ProfilePage /> : <Redirect to="/login" />}
+        <Route path="/" exact>
+          <Redirect to="/login" />
         </Route>
-        <Route path="/profile-form">
-          {authCtx.isLoggedIn ? <ProfileForm /> : <Redirect to="/login" />}
-        </Route>{" "}
-        {!authCtx.isLoggedIn && (
-          <Route path="/profile" render={() => <Redirect to="/login" />} />
-        )}
-        <Route path="/login" component={LoginForm} />
+
+        <Route path="/login">
+          {isLoggedIn ? <Redirect to="/expense" /> : <LoginForm />}
+        </Route>
+
+        <Route path="/signup">
+          {isLoggedIn ? <Redirect to="/expense" /> : <SignupForm />}
+        </Route>
+
         <Route path="/forgetForm" component={ForgetForm} />
-        {authCtx.isLoggedIn && (
-          <Route path="/expense" component={ExpensePage} />
-        )}
+
+        <Route path="/profile">
+          {isLoggedIn ? <ProfilePage /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/profile-form">
+          {isLoggedIn ? <ProfileForm /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/expense">
+          {isLoggedIn ? <ExpensePage /> : <Redirect to="/login" />}
+        </Route>
+
         <Route path="*" component={NotFound} />
       </Switch>
     </>
