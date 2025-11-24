@@ -10,6 +10,18 @@ const ExpenseForm = ({ onAddExpense, editingExpense }) => {
   const descriptionRef = useRef();
   const categoryRef = useRef();
 
+  useEffect(() => {
+    if (editingExpense) {
+      expenseRef.current.value = editingExpense.expense;
+      descriptionRef.current.value = editingExpense.description;
+      categoryRef.current.value = editingExpense.category;
+    } else {
+      expenseRef.current.value = "";
+      descriptionRef.current.value = "";
+      categoryRef.current.value = "";
+    }
+  }, [editingExpense]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -19,24 +31,20 @@ const ExpenseForm = ({ onAddExpense, editingExpense }) => {
       description: descriptionRef.current.value,
       category: categoryRef.current.value,
     };
+
     await onAddExpense(expenseData);
 
     setLoading(false);
-    expenseRef.current.value = "";
-    descriptionRef.current.value = "";
-    categoryRef.current.value = "";
+
+    if (!editingExpense) {
+      expenseRef.current.value = "";
+      descriptionRef.current.value = "";
+      categoryRef.current.value = "";
+    }
   };
 
-  useEffect(() => {
-    if (editingExpense) {
-      expenseRef.current.value = editingExpense.expense;
-      descriptionRef.current.value = editingExpense.description;
-      categoryRef.current.value = editingExpense.category;
-    }
-  }, [editingExpense]);
-
   return (
-    <Container className="my-5" style={{ maxWidth: "400px", my: "1rem" }}>
+    <Container className="my-5" style={{ maxWidth: "400px" }}>
       <Card
         style={{ width: "22rem" }}
         className={`py-3 ${
@@ -44,7 +52,9 @@ const ExpenseForm = ({ onAddExpense, editingExpense }) => {
         }`}
       >
         <Card.Body>
-          <Card.Title className="text-center mb-3">Expense Entry</Card.Title>
+          <Card.Title className="text-center mb-3">
+            {editingExpense ? "Edit Expense" : "Expense Entry"}
+          </Card.Title>
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Expense</Form.Label>
@@ -69,11 +79,7 @@ const ExpenseForm = ({ onAddExpense, editingExpense }) => {
 
             <Form.Group className="mb-3">
               <Form.Label>Category</Form.Label>
-              <Form.Select
-                aria-label="Select Category"
-                ref={categoryRef}
-                required
-              >
+              <Form.Select ref={categoryRef} required>
                 <option value="">Select Category</option>
                 <option value="Food">Food</option>
                 <option value="Transport">Transport</option>
@@ -83,6 +89,7 @@ const ExpenseForm = ({ onAddExpense, editingExpense }) => {
                 <option value="Other">Other</option>
               </Form.Select>
             </Form.Group>
+
             <div className="d-grid gap-2">
               <Button
                 type="submit"
@@ -98,9 +105,11 @@ const ExpenseForm = ({ onAddExpense, editingExpense }) => {
                       size="sm"
                       role="status"
                       aria-hidden="true"
-                    />
-                    Adding...
+                    />{" "}
+                    {editingExpense ? "Updating..." : "Adding..."}
                   </>
+                ) : editingExpense ? (
+                  "Update Expense"
                 ) : (
                   "Add Expense"
                 )}

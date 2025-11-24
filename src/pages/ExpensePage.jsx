@@ -8,7 +8,6 @@ import { expensesActions } from "../store/expensesSlice";
 const ExpensePage = () => {
   const dispatch = useDispatch();
   const expenses = useSelector((state) => state.expenses.items);
-  const userId = useSelector((state) => state.auth.uid);
   const idToken = useSelector((state) => state.auth.token);
 
   const [toast, setToast] = useState({
@@ -19,107 +18,113 @@ const ExpensePage = () => {
   const [loading, setLoading] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
 
-  // Fetch expense list
-  const expenseHandler = async () => {
-    if (!userId || !idToken) return;
+  // Fetch all expenses
+  const fetchExpenses = async () => {
+    if (!idToken) return;
     setLoading(true);
     try {
       const response = await fetch(
-        `https://expense-tracker-414ee-default-rtdb.firebaseio.com/users/${userId}/expenses.json?auth=${idToken}`
+        `https://expense-tracker-backend-oxgr.onrender.com/api/expenses`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${idToken}` },
+        }
       );
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error?.message || "Something went wrong");
-      }
-      const data = await response.json();
 
-      // data into array format
-      const loadedExpenses = Object.entries(data || {}).map(
-        ([id, expense]) => ({
-          id,
-          ...expense,
-        })
-      );
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.message || "Failed to fetch expenses");
+
+      // Map _id to id
+      const loadedExpenses = data.map((exp) => ({
+        id: exp._id,
+        ...exp,
+      }));
+
       dispatch(expensesActions.setExpenses(loadedExpenses));
     } catch (err) {
-      console.error("Server error:", err);
+      console.error("Fetch error:", err.message);
     }
     setLoading(false);
   };
 
-  // Add or update expense for authenticated user
-  const addExpenseHandler = async (newExpense) => {
-    if (!userId || !idToken) return;
-
+  // Add or update expense
+  const saveExpenseHandler = async (expenseData) => {
+    if (!idToken) return;
     setLoading(true);
+
+    const isUpdate = !!editingExpense?.id;
+    const url = isUpdate
+      ? `https://expense-tracker-backend-oxgr.onrender.com/api/expenses/${editingExpense.id}`
+      : `https://expense-tracker-backend-oxgr.onrender.com/api/expenses`;
+    const method = isUpdate ? "PATCH" : "POST";
+
     try {
-      let url = `https://expense-tracker-414ee-default-rtdb.firebaseio.com/users/${userId}/expenses.json?auth=${idToken}`;
-      let method = "POST";
-
-      if (editingExpense?.id) {
-        url = `https://expense-tracker-414ee-default-rtdb.firebaseio.com/users/${userId}/expenses/${editingExpense.id}.json?auth=${idToken}`;
-        method = "PUT";
-      }
-
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newExpense),
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(expenseData),
       });
 
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error?.message || "Failed to add expense");
-      }
+      if (!response.ok)
+        throw new Error(data.message || "Failed to save expense");
+
       setToast({
         show: true,
-        message: editingExpense
+        message: isUpdate
           ? "Expense updated successfully"
           : "Expense added successfully",
         variant: "success",
       });
 
-      if (editingExpense?.id) {
+      if (isUpdate) {
         dispatch(
           expensesActions.updateExpense({
             id: editingExpense.id,
-            ...newExpense,
+            ...expenseData,
           })
         );
       } else {
-        const newItem = { id: data.name, ...newExpense };
-        dispatch(expensesActions.addExpense(newItem));
+        // MongoDB returns _id
+        dispatch(expensesActions.addExpense({ id: data._id, ...expenseData }));
       }
 
       setEditingExpense(null);
     } catch (err) {
-      console.error(err);
+      console.error("Save error:", err.message);
     }
     setLoading(false);
   };
 
-  // Edit an expense locally
+  // Edit expense locally
   const editExpenseHandler = (id) => {
-    const editing = expenses.find((item) => item.id === id);
-    if (editing) {
-      setEditingExpense(editing);
-    }
+    const editing = expenses.find((e) => e.id === id);
+    if (editing) setEditingExpense(editing);
   };
 
-  // Delete an expense
+  // Delete expense
   const deleteExpenseHandler = async (id) => {
-    if (!userId || !idToken) return;
-
+    if (!idToken) return;
     setLoading(true);
+
     try {
       const response = await fetch(
-        `https://expense-tracker-414ee-default-rtdb.firebaseio.com/users/${userId}/expenses/${id}.json?auth=${idToken}`,
-        { method: "DELETE" }
+        `https://expense-tracker-backend-oxgr.onrender.com/api/expenses/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${idToken}` },
+        }
       );
-      if (!response.ok) throw new Error("Failed to delete expense");
+
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.message || "Failed to delete expense");
 
       dispatch(expensesActions.deleteExpense(id));
-
       setToast({
         show: true,
         message: "Expense deleted successfully",
@@ -132,13 +137,13 @@ const ExpensePage = () => {
   };
 
   useEffect(() => {
-    expenseHandler();
-  }, [userId, idToken]);
+    fetchExpenses();
+  }, [idToken]);
 
   return (
     <Container className="my-4">
       <ExpenseForm
-        onAddExpense={addExpenseHandler}
+        onAddExpense={saveExpenseHandler}
         editingExpense={editingExpense}
       />
       <ExpenseTable
