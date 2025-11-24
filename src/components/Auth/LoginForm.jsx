@@ -31,18 +31,29 @@ const LoginForm = () => {
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
 
-    const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
+    // const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
 
     try {
+      // const response = await fetch(
+      //   `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+      //   {
+      //     method: "POST",
+      //     body: JSON.stringify({
+      //       email: email,
+      //       password: password,
+      //       returnSecureToken: true,
+      //     }),
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
+
       const response = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+        "https://expense-tracker-backend-oxgr.onrender.com/api/auth/login",
         {
           method: "POST",
-          body: JSON.stringify({
-            email: email,
-            password: password,
-            returnSecureToken: true,
-          }),
+          body: JSON.stringify({ email, password }),
           headers: {
             "Content-Type": "application/json",
           },
@@ -50,7 +61,7 @@ const LoginForm = () => {
       );
 
       const data = await response.json();
-
+      console.log("data", data);
       if (!response.ok) {
         alert("wrong email and password");
         throw new Error(data.error.message || "Something went wrong");
@@ -60,9 +71,9 @@ const LoginForm = () => {
       setError("");
       dispatch(
         authActions.login({
-          token: data.idToken,
-          email: data.email,
-          uid: data.localId,
+          token: data.token,
+          email: data.user.email,
+          uid: data.id,
         })
       );
       authCtx.login(data.idToken, data.email);

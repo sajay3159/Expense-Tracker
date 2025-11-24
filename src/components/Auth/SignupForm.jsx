@@ -10,10 +10,11 @@ import Form from "react-bootstrap/Form";
 import { Link, useHistory } from "react-router-dom";
 
 const SignupForm = () => {
+  const nameRef = useRef();
   const emailRef = useRef();
-  const history = useHistory();
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
+  const history = useHistory();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,27 +23,23 @@ const SignupForm = () => {
     e.preventDefault();
     setLoading(true);
 
+    const name = nameRef.current.value;
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
     const confirmPassword = confirmPasswordRef.current.value;
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      setLoading(false);
       return;
     }
 
-    const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
-
     try {
       const response = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+        "https://expense-tracker-backend-oxgr.onrender.com/api/auth/signup",
         {
           method: "POST",
-          body: JSON.stringify({
-            email: email,
-            password: password,
-            returnSecureToken: true,
-          }),
+          body: JSON.stringify({ name, email, password }),
           headers: {
             "Content-Type": "application/json",
           },
@@ -52,17 +49,20 @@ const SignupForm = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error.message || "Something went wrong");
+        throw new Error(data.message || "Signup failed");
       }
 
       setSuccess("Signup successful!");
       setError("");
-      history.push("/login");
+      localStorage.setItem("token", data.token);
+
+      history.push("/login"); // navigate to login page
     } catch (err) {
       setError(err.message);
       setSuccess("");
     } finally {
       setLoading(false);
+      nameRef.current.value = "";
       emailRef.current.value = "";
       passwordRef.current.value = "";
       confirmPasswordRef.current.value = "";
@@ -75,6 +75,14 @@ const SignupForm = () => {
         <Card.Body>
           <Card.Title className="text-center py-4">Sign Up</Card.Title>
           <Form onSubmit={handleSubmit}>
+            <FloatingLabel label="Name" className="mb-3">
+              <Form.Control
+                type="text"
+                placeholder="Enter name"
+                ref={nameRef}
+              />
+            </FloatingLabel>
+
             <FloatingLabel label="Email address" className="mb-3">
               <Form.Control
                 type="email"
