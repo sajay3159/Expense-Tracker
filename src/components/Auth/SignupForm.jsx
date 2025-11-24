@@ -40,23 +40,16 @@ const SignupForm = () => {
         {
           method: "POST",
           body: JSON.stringify({ name, email, password }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Signup failed");
-      }
+      if (!response.ok) throw new Error(data.message || "Signup failed");
 
       setSuccess("Signup successful!");
       setError("");
       localStorage.setItem("token", data.token);
-
-      history.push("/login"); // navigate to login page
+      history.push("/login");
     } catch (err) {
       setError(err.message);
       setSuccess("");
@@ -70,24 +63,34 @@ const SignupForm = () => {
   };
 
   return (
-    <Container className="my-5" style={{ maxWidth: "400px" }}>
-      <Card style={{ width: "20rem" }} className="py-3 mb-3">
+    <Container className="d-flex justify-content-center align-items-center vh-100">
+      <Card
+        className="p-4 shadow-lg rounded-4"
+        style={{ width: "350px", backgroundColor: "#ffffff" }}
+      >
         <Card.Body>
-          <Card.Title className="text-center py-4">Sign Up</Card.Title>
+          <Card.Title className="text-center mb-4 fw-bold fs-3 text-primary">
+            Sign Up
+          </Card.Title>
+
           <Form onSubmit={handleSubmit}>
             <FloatingLabel label="Name" className="mb-3">
               <Form.Control
                 type="text"
-                placeholder="Enter name"
+                placeholder="Name"
                 ref={nameRef}
+                className="rounded-pill"
+                required
               />
             </FloatingLabel>
 
             <FloatingLabel label="Email address" className="mb-3">
               <Form.Control
                 type="email"
-                placeholder="Enter email"
+                placeholder="Email"
                 ref={emailRef}
+                className="rounded-pill"
+                required
               />
             </FloatingLabel>
 
@@ -96,6 +99,8 @@ const SignupForm = () => {
                 type="password"
                 placeholder="Password"
                 ref={passwordRef}
+                className="rounded-pill"
+                required
               />
             </FloatingLabel>
 
@@ -104,6 +109,8 @@ const SignupForm = () => {
                 type="password"
                 placeholder="Confirm Password"
                 ref={confirmPasswordRef}
+                className="rounded-pill"
+                required
               />
             </FloatingLabel>
 
@@ -114,7 +121,7 @@ const SignupForm = () => {
               <Button
                 type="submit"
                 variant="primary"
-                style={{ borderRadius: "20px" }}
+                className="rounded-pill py-2"
                 disabled={loading}
               >
                 {loading ? (
@@ -125,7 +132,7 @@ const SignupForm = () => {
                       size="sm"
                       role="status"
                       aria-hidden="true"
-                    />
+                    />{" "}
                     Signing up...
                   </>
                 ) : (
@@ -135,24 +142,20 @@ const SignupForm = () => {
             </div>
           </Form>
         </Card.Body>
-      </Card>
-      <Card
-        style={{ width: "20rem", backgroundColor: "#c3dbcf" }}
-        className="py-2"
-      >
-        <Card.Body className="text-center">
+
+        <Card.Footer className="text-center bg-white border-0 mt-2">
           Have an account?{" "}
           <Link
             to="/login"
             style={{
-              textDecoration: "underline",
-              cursor: "pointer",
-              color: "blue",
+              color: "#6c63ff",
+              fontWeight: "600",
+              textDecoration: "none",
             }}
           >
             Login
           </Link>
-        </Card.Body>
+        </Card.Footer>
       </Card>
     </Container>
   );

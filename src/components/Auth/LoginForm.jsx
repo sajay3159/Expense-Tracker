@@ -21,64 +21,38 @@ const LoginForm = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const forgetPasswordHandler = () => {
-    history.push("/forgetForm");
-  };
+  const forgetPasswordHandler = () => history.push("/forgetForm");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
 
-    // const apiKey = "AIzaSyDpWVsvC9evJbXOQnZHUyAxGQIOfLTaZOs";
-
     try {
-      // const response = await fetch(
-      //   `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
-      //   {
-      //     method: "POST",
-      //     body: JSON.stringify({
-      //       email: email,
-      //       password: password,
-      //       returnSecureToken: true,
-      //     }),
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //   }
-      // );
-
       const response = await fetch(
         "https://expense-tracker-backend-oxgr.onrender.com/api/auth/login",
         {
           method: "POST",
           body: JSON.stringify({ email, password }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
-
       const data = await response.json();
-      console.log("data", data);
-      if (!response.ok) {
-        alert("wrong email and password");
-        throw new Error(data.error.message || "Something went wrong");
-      }
+      if (!response.ok) throw new Error(data.message || "Login failed");
 
       setSuccess("Login successful!");
       setError("");
+
       dispatch(
         authActions.login({
           token: data.token,
           email: data.user.email,
-          uid: data.id,
+          uid: data.user._id,
         })
       );
-      authCtx.login(data.idToken, data.email);
-      localStorage.setItem("token", data.idToken);
 
+      localStorage.setItem("token", data.token);
       history.push("/profile");
     } catch (err) {
       setError(err.message);
@@ -91,16 +65,24 @@ const LoginForm = () => {
   };
 
   return (
-    <Container className="my-5" style={{ maxWidth: "400px" }}>
-      <Card style={{ width: "20rem" }} className="py-3 mb-3">
+    <Container className="d-flex justify-content-center align-items-center vh-100">
+      <Card
+        className="p-4 shadow-lg rounded-4"
+        style={{ width: "350px", backgroundColor: "#ffffff" }}
+      >
         <Card.Body>
-          <Card.Title className="text-center py-4">Login</Card.Title>
+          <Card.Title className="text-center mb-4 fw-bold fs-3 text-primary">
+            Login
+          </Card.Title>
+
           <Form onSubmit={handleSubmit}>
             <FloatingLabel label="Email address" className="mb-3">
               <Form.Control
                 type="email"
-                placeholder="Enter email"
+                placeholder="Email"
                 ref={emailRef}
+                className="rounded-pill"
+                required
               />
             </FloatingLabel>
 
@@ -109,8 +91,11 @@ const LoginForm = () => {
                 type="password"
                 placeholder="Password"
                 ref={passwordRef}
+                className="rounded-pill"
+                required
               />
             </FloatingLabel>
+
             {error && <p className="text-danger text-center">{error}</p>}
             {success && <p className="text-success text-center">{success}</p>}
 
@@ -118,7 +103,7 @@ const LoginForm = () => {
               <Button
                 type="submit"
                 variant="primary"
-                style={{ borderRadius: "20px" }}
+                className="rounded-pill py-2"
                 disabled={loading}
               >
                 {loading ? (
@@ -129,40 +114,38 @@ const LoginForm = () => {
                       size="sm"
                       role="status"
                       aria-hidden="true"
-                    />
-                    Logging...
+                    />{" "}
+                    Logging in...
                   </>
                 ) : (
                   "Login"
                 )}
               </Button>
+
               <NavLink
-                className="text-center text-primary text-decoration-underline"
+                className="text-center text-primary mt-1"
+                style={{ cursor: "pointer", fontWeight: "500" }}
                 onClick={forgetPasswordHandler}
               >
-                Forget Password
+                Forgot Password?
               </NavLink>
             </div>
           </Form>
         </Card.Body>
-      </Card>
-      <Card
-        style={{ width: "20rem", backgroundColor: "#c3dbcf" }}
-        className="py-2"
-      >
-        <Card.Body className="text-center">
+
+        <Card.Footer className="text-center bg-white border-0 mt-2">
           Don't have an account?{" "}
           <Link
             to="/signup"
             style={{
-              textDecoration: "underline",
-              cursor: "pointer",
-              color: "blue",
+              color: "#6c63ff",
+              fontWeight: "600",
+              textDecoration: "none",
             }}
           >
             Sign up
           </Link>
-        </Card.Body>
+        </Card.Footer>
       </Card>
     </Container>
   );
