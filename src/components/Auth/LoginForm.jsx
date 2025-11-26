@@ -53,7 +53,7 @@ const LoginForm = () => {
       );
 
       localStorage.setItem("token", data.token);
-      history.push("/profile");
+      history.push("/expense");
     } catch (err) {
       setError(err.message);
       setSuccess("");
